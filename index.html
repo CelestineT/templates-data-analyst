@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Templates Data Analyst - By Célestine</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 60px;
+        }
+        
+        .header h1 {
+            font-size: 48px;
+            margin-bottom: 20px;
+            text-shadow: 0 4px 6px rgba(0,0,0,0.2);
+        }
+        
+        .header p {
+            font-size: 20px;
+            opacity: 0.95;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        
+        .templates-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin-bottom: 60px;
+        }
+        
+        .template-card {
+            background: white;
+            border-radius: 20px;
+            padding: 35px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        
+        .template-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 30px 80px rgba(0,0,0,0.4);
+        }
+        
+        .template-icon {
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+        
+        .template-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 15px;
+        }
+        
+        .template-desc {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 25px;
+            font-size: 15px;
+        }
+        
+        .template-btn {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 30px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        
+        .template-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .footer {
+            text-align: center;
+            color: white;
+            margin-top: 60px;
+            padding: 30px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 15px;
+        }
+        
+        .footer a {
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+            border-bottom: 2px solid white;
+        }
+        
+        .footer a:hover {
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎁 Templates Data Analyst</h1>
+            <p>5 outils interactifs gratuits pour améliorer votre productivité en data analytics</p>
+        </div>
+        
+        <div class="templates-grid">
+            <div class="template-card" onclick="window.location.href='checklist-dataset.html'">
+                <div class="template-icon">📋</div>
+                <div class="template-title">Checklist Dataset</div>
+                <div class="template-desc">
+                    Évaluez la qualité de vos données en 6 dimensions (complétude, fraîcheur, granularité...) 
+                    avant toute analyse. Décision automatique : GO / ATTENTION / STOP.
+                </div>
+                <a href="checklist-dataset.html" class="template-btn">Utiliser →</a>
+            </div>
+            
+            <div class="template-card" onclick="window.location.href='calendrier-linkedin.html'">
+                <div class="template-icon">📅</div>
+                <div class="template-title">Calendrier LinkedIn</div>
+                <div class="template-desc">
+                    Planifiez votre contenu LinkedIn sur 4 semaines avec une ligne éditoriale structurée. 
+                    Banque d'idées + suivi des statistiques inclus.
+                </div>
+                <a href="calendrier-linkedin.html" class="template-btn">Utiliser →</a>
+            </div>
+            
+            <div class="template-card" onclick="window.location.href='dashboard-pme.html'">
+                <div class="template-icon">📊</div>
+                <div class="template-title">Dashboard PME</div>
+                <div class="template-desc">
+                    Suivez 5 KPIs financiers essentiels (CA, Marge, Trésorerie, DSO, Charges/CA) 
+                    avec calculs automatiques et alertes visuelles.
+                </div>
+                <a href="dashboard-pme.html" class="template-btn">Utiliser →</a>
+            </div>
+            
+            <div class="template-card" onclick="window.location.href='matrice-priorisation.html'">
+                <div class="template-icon">🎯</div>
+                <div class="template-title">Matrice Priorisation</div>
+                <div class="template-desc">
+                    Gérez vos demandes d'analyses avec le framework Impact/Effort. 
+                    Scoring automatique + templates de réponses (accepter/refuser/planifier).
+                </div>
+                <a href="matrice-priorisation.html" class="template-btn">Utiliser →</a>
+            </div>
+            
+            <div class="template-card" onclick="window.location.href='tracker-competences.html'">
+                <div class="template-icon">📚</div>
+                <div class="template-title">Tracker Compétences</div>
+                <div class="template-desc">
+                    Suivez votre montée en compétences data (SQL, Python, Power BI, Stats...). 
+                    Roadmap trimestrielle + bibliothèque de ressources intégrée.
+                </div>
+                <a href="tracker-competences.html" class="template-btn">Utiliser →</a>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>
+                💜 Créé par <a href="https://www.linkedin.com/in/celestine-votre-profil" target="_blank">Célestine</a> 
+                | Synteya Partners
+            </p>
+            <p style="margin-top: 15px; opacity: 0.9;">
+                Templates 100% gratuits • Open Source • Partagez librement
+            </p>
+        </div>
+    </div>
+</body>
+</html>
