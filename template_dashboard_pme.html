@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard PME - 5 KPIs</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f0f2f5;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        
+        .header-info {
+            display: flex;
+            gap: 30px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .header-info input {
+            background: rgba(255,255,255,0.2);
+            border: 2px solid rgba(255,255,255,0.3);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+        
+        .header-info input::placeholder {
+            color: rgba(255,255,255,0.7);
+        }
+        
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .kpi-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .kpi-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+        }
+        
+        .kpi-card.ca::before {
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .kpi-card.marge::before {
+            background: linear-gradient(90deg, #f093fb 0%, #f5576c 100%);
+        }
+        
+        .kpi-card.tresorerie::before {
+            background: linear-gradient(90deg, #4facfe 0%, #00f2fe 100%);
+        }
+        
+        .kpi-card.dso::before {
+            background: linear-gradient(90deg, #43e97b 0%, #38f9d7 100%);
+        }
+        
+        .kpi-card.charges::before {
+            background: linear-gradient(90deg, #fa709a 0%, #fee140 100%);
+        }
+        
+        .kpi-title {
+            font-size: 14px;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 15px;
+        }
+        
+        .kpi-value {
+            font-size: 42px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .kpi-input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            margin: 5px 0;
+            transition: all 0.3s;
+        }
+        
+        .kpi-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .kpi-comparison {
+            display: flex;
+            gap: 15px;
+            margin-top: 15px;
+            font-size: 13px;
+        }
+        
+        .comparison-item {
+            flex: 1;
+        }
+        
+        .comparison-label {
+            color: #666;
+            margin-bottom: 5px;
+        }
+        
+        .comparison-value {
+            font-weight: bold;
+            font-size: 16px;
+        }
+        
+        .trend-up {
+            color: #4caf50;
+        }
+        
+        .trend-down {
+            color: #f44336;
+        }
+        
+        .trend-neutral {
+            color: #ff9800;
+        }
+        
+        .alert-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        
+        .alert-green {
+            background: #4caf50;
+            color: white;
+        }
+        
+        .alert-orange {
+            background: #ff9800;
+            color: white;
+        }
+        
+        .alert-red {
+            background: #f44336;
+            color: white;
+        }
+        
+        .synthesis {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            margin-top: 30px;
+        }
+        
+        .synthesis h2 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        
+        .synthesis-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .synthesis-table th {
+            background: #f8f9fa;
+            padding: 12px;
+            text-align: left;
+            font-size: 13px;
+            color: #666;
+            text-transform: uppercase;
+        }
+        
+        .synthesis-table td {
+            padding: 15px 12px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .synthesis-table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .action-input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #e0e0e0;
+            border-radius: 5px;
+            font-size: 13px;
+        }
+        
+        .export-section {
+            margin-top: 30px;
+            text-align: center;
+        }
+        
+        .export-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 30px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .export-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+
+        .mini-chart {
+            height: 60px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin-top: 15px;
+            display: flex;
+            align-items: flex-end;
+            padding: 10px;
+            gap: 5px;
+        }
+
+        .bar {
+            flex: 1;
+            background: linear-gradient(to top, #667eea, #764ba2);
+            border-radius: 3px 3px 0 0;
+            transition: all 0.3s;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 Dashboard Financier PME</h1>
+            <div class="header-info">
+                <input type="text" id="companyName" placeholder="Nom de l'entreprise">
+                <input type="month" id="period" value="">
+            </div>
+        </div>
+        
+        <div class="kpi-grid">
+            <!-- KPI 1: CA -->
+            <div class="kpi-card ca">
+                <div class="kpi-title">Chiffre d'Affaires</div>
+                <div class="kpi-value" id="caValue">0 €</div>
+                <input type="number" class="kpi-input" id="caInput" placeholder="CA mensuel HT" 
+                    oninput="updateKPI('ca', this.value)">
+                
+                <div class="kpi-comparison">
+                    <div class="comparison-item">
+                        <div class="comparison-label">vs M-1</div>
+                        <div class="comparison-value trend-neutral" id="caM1">-</div>
+                    </div>
+                    <div class="comparison-item">
+                        <div class="comparison-label">vs N-1</div>
+                        <div class="comparison-value trend-neutral" id="caN1">-</div>
+                    </div>
+                    <div class="comparison-item">
+                        <div class="comparison-label">vs Objectif</div>
+                        <div class="comparison-value trend-neutral" id="caObj">-</div>
+                    </div>
+                </div>
+                
+                <div id="caAlert" class="alert-badge alert-green" style="display:none;">🟢 Objectif atteint</div>
+                
+                <div class="mini-chart" id="caChart"></div>
+            </div>
+            
+            <!-- KPI 2: Marge -->
+            <div class="kpi-card marge">
+                <div class="kpi-title">Marge Brute</div>
+                <div class="kpi-value" id="margeValue">0 %</div>
+                <input type="number" class="kpi-input" id="coutDirects" placeholder="Coûts directs (€)" 
+                    oninput="updateMarge()">
+                
+                <div class="kpi-comparison">
+                    <div class="comparison-item">
+                        <div class="comparison-label">Marge (€)</div>
+                        <div class="comparison-value" id="margeEuro">0 €</div>
+                    </div>
+                    <div class="comparison-item">
+                        <div class="comparison-label">Coûts</div>
+                        <div class="comparison-value" id="coutValue">0 €</div>
+                    </div>
+                </div>
+                
+                <div id="margeAlert" class="alert-badge alert-green" style="display:none;">🟢 Marge saine</div>
+            </div>
+            
+            <!-- KPI 3: Trésorerie -->
+            <div class="kpi-card tresorerie">
+                <div class="kpi-title">Trésorerie Disponible</div>
+                <div class="kpi-value" id="tresoValue">0 €</div>
+                <input type="number" class="kpi-input" id="tresoInput" placeholder="Solde banque + placements" 
+                    oninput="updateKPI('treso', this.value)">
+                
+                <div class="kpi-comparison">
+                    <div class="comparison-item">
+                        <div class="comparison-label">Mois de charges</div>
+                        <div class="comparison-value" id="moisCharges">0</div>
+                    </div>
+                    <div class="comparison-item">
+                        <div class="comparison-label">Évolution</div>
+                        <div class="comparison-value trend-neutral" id="tresoEvol">-</div>
+                    </div>
+                </div>
+                
+                <div id="tresoAlert" class="alert-badge alert-green" style="display:none;">🟢 Situation saine</div>
+            </div>
+            
+            <!-- KPI 4: DSO -->
+            <div class="kpi-card dso">
+                <div class="kpi-title">Encours Clients (DSO)</div>
+                <div class="kpi-value" id="dsoValue">0 j</div>
+                <input type="number" class="kpi-input" id="creancesInput" placeholder="Créances clients (€)" 
+                    oninput="updateDSO()">
+                
+                <div class="kpi-comparison">
+                    <div class="comparison-item">
+                        <div class="comparison-label">< 30j</div>
+                        <div class="comparison-value">-</div>
+                    </div>
+                    <div class="comparison-item">
+                        <div class="comparison-label">30-60j</div>
+                        <div class="comparison-value">-</div>
+                    </div>
+                    <div class="comparison-item">
+                        <div class="comparison-label">> 60j</div>
+                        <div class="comparison-value trend-neutral">-</div>
+                    </div>
+                </div>
+                
+                <div id="dsoAlert" class="alert-badge alert-green" style="display:none;">🟢 DSO maîtrisé</div>
+            </div>
+            
+            <!-- KPI 5: Charges/CA -->
+            <div class="kpi-card charges">
+                <div class="kpi-title">Charges Fixes / CA</div>
+                <div class="kpi-value" id="ratioValue">0 %</div>
+                <input type="number" class="kpi-input" id="chargesInput" placeholder="Charges fixes (€)" 
+                    oninput="updateRatio()">
+                
+                <div class="kpi-comparison">
+                    <div class="comparison-item">
+                        <div class="comparison-label">Charges</div>
+                        <div class="comparison-value" id="chargesValue">0 €</div>
+                    </div>
+                    <div class="comparison-item">
+                        <div class="comparison-label">Point mort</div>
+                        <div class="comparison-value" id="pointMort">0 €</div>
+                    </div>
+                </div>
+                
+                <div id="ratioAlert" class="alert-badge alert-green" style="display:none;">🟢 Ratio optimal</div>
+            </div>
+        </div>
+        
+        <div class="synthesis">
+            <h2>🎯 Synthèse Mensuelle</h2>
+            <table class="synthesis-table">
+                <thead>
+                    <tr>
+                        <th>Indicateur</th>
+                        <th>Statut</th>
+                        <th>Action Prioritaire</th>
+                    </tr>
+                </thead>
+                <tbody id="synthesisBody">
+                    <tr>
+                        <td>Chiffre d'Affaires</td>
+                        <td><span class="alert-badge alert-green">🟢</span></td>
+                        <td><input type="text" class="action-input" placeholder="Ex: Continuer la dynamique"></td>
+                    </tr>
+                    <tr>
+                        <td>Marge Brute</td>
+                        <td><span class="alert-badge alert-green">🟢</span></td>
+                        <td><input type="text" class="action-input" placeholder="Ex: Négocier fournisseurs"></td>
+                    </tr>
+                    <tr>
+                        <td>Trésorerie</td>
+                        <td><span class="alert-badge alert-green">🟢</span></td>
+                        <td><input type="text" class="action-input" placeholder="Ex: Maintenir le niveau"></td>
+                    </tr>
+                    <tr>
+                        <td>DSO</td>
+                        <td><span class="alert-badge alert-green">🟢</span></td>
+                        <td><input type="text" class="action-input" placeholder="Ex: Relancer clients >60j"></td>
+                    </tr>
+                    <tr>
+                        <td>Charges/CA</td>
+                        <td><span class="alert-badge alert-green">🟢</span></td>
+                        <td><input type="text" class="action-input" placeholder="Ex: Optimiser coûts fixes"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="export-section">
+            <button class="export-btn" onclick="exportDashboard()">📥 Exporter le Dashboard (CSV)</button>
+        </div>
+    </div>
+
+    <script>
+        let data = {
+            ca: 0,
+            coutDirects: 0,
+            tresorerie: 0,
+            creances: 0,
+            charges: 0
+        };
+
+        document.getElementById('period').value = new Date().toISOString().slice(0, 7);
+
+        function updateKPI(type, value) {
+            data[type === 'ca' ? 'ca' : 'tresorerie'] = parseFloat(value) || 0;
+            
+            if (type === 'ca') {
+                document.getElementById('caValue').textContent = formatNumber(data.ca) + ' €';
+                updateMarge();
+                updateDSO();
+                updateRatio();
+                updateCAAlert();
+                updateChart();
+            } else {
+                document.getElementById('tresoValue').textContent = formatNumber(data.tresorerie) + ' €';
+                updateTresoAlert();
+            }
+        }
+
+        function updateMarge() {
+            data.coutDirects = parseFloat(document.getElementById('coutDirects').value) || 0;
+            const marge = data.ca > 0 ? ((data.ca - data.coutDirects) / data.ca) * 100 : 0;
+            const margeEuro = data.ca - data.coutDirects;
+            
+            document.getElementById('margeValue').textContent = marge.toFixed(1) + ' %';
+            document.getElementById('margeEuro').textContent = formatNumber(margeEuro) + ' €';
+            document.getElementById('coutValue').textContent = formatNumber(data.coutDirects) + ' €';
+            
+            updateMargeAlert(marge);
+        }
+
+        function updateDSO() {
+            data.creances = parseFloat(document.getElementById('creancesInput').value) || 0;
+            const dso = data.ca > 0 ? (data.creances / data.ca) * 30 : 0;
+            
+            document.getElementById('dsoValue').textContent = Math.round(dso) + ' j';
+            updateDSOAlert(dso);
+        }
+
+        function updateRatio() {
+            data.charges = parseFloat(document.getElementById('chargesInput').value) || 0;
+            const ratio = data.ca > 0 ? (data.charges / data.ca) * 100 : 0;
+            
+            document.getElementById('ratioValue').textContent = ratio.toFixed(1) + ' %';
+            document.getElementById('chargesValue').textContent = formatNumber(data.charges) + ' €';
+            document.getElementById('pointMort').textContent = formatNumber(data.charges) + ' €';
+            
+            updateRatioAlert(ratio);
+            updateMoisCharges();
+        }
+
+        function updateMoisCharges() {
+            const mois = data.charges > 0 ? data.tresorerie / data.charges : 0;
+            document.getElementById('moisCharges').textContent = mois.toFixed(1);
+        }
+
+        function updateCAAlert() {
+            const alert = document.getElementById('caAlert');
+            alert.style.display = 'block';
+            if (data.ca > 0) {
+                alert.className = 'alert-badge alert-green';
+                alert.textContent = '🟢 CA enregistré';
+            }
+        }
+
+        function updateMargeAlert(marge) {
+            const alert = document.getElementById('margeAlert');
+            alert.style.display = 'block';
+            
+            if (marge >= 40) {
+                alert.className = 'alert-badge alert-green';
+                alert.textContent = '🟢 Marge excellente';
+            } else if (marge >= 30) {
+                alert.className = 'alert-badge alert-orange';
+                alert.textContent = '🟡 Marge correcte';
+            } else {
+                alert.className = 'alert-badge alert-red';
+                alert.textContent = '🔴 Marge faible';
+            }
+        }
+
+        function updateTresoAlert() {
+            const mois = data.charges > 0 ? data.tresorerie / data.charges : 0;
+            const alert = document.getElementById('tresoAlert');
+            alert.style.display = 'block';
+            
+            if (mois >= 2) {
+                alert.className = 'alert-badge alert-green';
+                alert.textContent = '🟢 Trésorerie saine';
+            } else if (mois >= 1) {
+                alert.className = 'alert-badge alert-orange';
+                alert.textContent = '🟡 Vigilance requise';
+            } else {
+                alert.className = 'alert-badge alert-red';
+                alert.textContent = '🔴 Attention critique';
+            }
+        }
+
+        function updateDSOAlert(dso) {
+            const alert = document.getElementById('dsoAlert');
+            alert.style.display = 'block';
+            
+            if (dso < 45) {
+                alert.className = 'alert-badge alert-green';
+                alert.textContent = '🟢 DSO maîtrisé';
+            } else if (dso < 60) {
+                alert.className = 'alert-badge alert-orange';
+                alert.textContent = '🟡 À surveiller';
+            } else {
+                alert.className = 'alert-badge alert-red';
+                alert.textContent = '🔴 Relances urgentes';
+            }
+        }
+
+        function updateRatioAlert(ratio) {
+            const alert = document.getElementById('ratioAlert');
+            alert.style.display = 'block';
+            
+            if (ratio < 50) {
+                alert.className = 'alert-badge alert-green';
+                alert.textContent = '🟢 Ratio optimal';
+            } else if (ratio < 60) {
+                alert.className = 'alert-badge alert-orange';
+                alert.textContent = '🟡 Attention';
+            } else {
+                alert.className = 'alert-badge alert-red';
+                alert.textContent = '🔴 Charges excessives';
+            }
+        }
+
+        function updateChart() {
+            const chart = document.getElementById('caChart');
+            const months = [data.ca * 0.7, data.ca * 0.85, data.ca * 0.9, data.ca * 0.95, data.ca];
+            const max = Math.max(...months);
+            
+            chart.innerHTML = months.map(val => 
+                `<div class="bar" style="height: ${max > 0 ? (val/max)*100 : 0}%"></div>`
+            ).join('');
+        }
+
+        function formatNumber(num) {
+            return new Intl.NumberFormat('fr-FR').format(Math.round(num));
+        }
+
+        function exportDashboard() {
+            const company = document.getElementById('companyName').value || 'Entreprise';
+            const period = document.getElementById('period').value;
+            
+            let csv = `Dashboard Financier PME\n\n`;
+            csv += `Entreprise,${company}\n`;
+            csv += `Période,${period}\n\n`;
+            csv += `KPI,Valeur,Statut\n`;
+            csv += `Chiffre d'Affaires,${data.ca} €,${document.getElementById('caAlert').textContent}\n`;
+            csv += `Marge Brute,${document.getElementById('margeValue').textContent},${document.getElementById('margeAlert').textContent}\n`;
+            csv += `Trésorerie,${data.tresorerie} €,${document.getElementById('tresoAlert').textContent}\n`;
+            csv += `DSO,${document.getElementById('dsoValue').textContent},${document.getElementById('dsoAlert').textContent}\n`;
+            csv += `Charges/CA,${document.getElementById('ratioValue').textContent},${document.getElementById('ratioAlert').textContent}\n`;
+            
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `dashboard_${company.replace(/\s+/g, '_')}_${period}.csv`;
+            a.click();
+        }
+    </script>
+</body>
+</html>
