@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Matrice de Priorisation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        
+        .tabs {
+            display: flex;
+            background: #f8f9fa;
+            border-bottom: 2px solid #e0e0e0;
+        }
+        
+        .tab {
+            flex: 1;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            border-bottom: 3px solid transparent;
+        }
+        
+        .tab:hover {
+            background: #e9ecef;
+        }
+        
+        .tab.active {
+            background: white;
+            border-bottom-color: #f5576c;
+            font-weight: bold;
+        }
+        
+        .tab-content {
+            display: none;
+            padding: 30px;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .add-request {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: #f5576c;
+        }
+        
+        .add-btn {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        
+        .add-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(245, 87, 108, 0.4);
+        }
+        
+        .requests-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        
+        .requests-table th {
+            background: #f8f9fa;
+            padding: 12px;
+            text-align: left;
+            font-size: 13px;
+            color: #666;
+            text-transform: uppercase;
+            border-bottom: 2px solid #e0e0e0;
+        }
+        
+        .requests-table td {
+            padding: 15px 12px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .requests-table tr:hover {
+            background: #f8f9fa;
+        }
+        
+        .quadrant-badge {
+            padding: 6px 12px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: bold;
+            display: inline-block;
+        }
+        
+        .quick-win {
+            background: #4caf50;
+            color: white;
+        }
+        
+        .strategic {
+            background: #2196f3;
+            color: white;
+        }
+        
+        .marginal {
+            background: #ff9800;
+            color: white;
+        }
+        
+        .avoid {
+            background: #f44336;
+            color: white;
+        }
+        
+        .score-cell {
+            font-size: 20px;
+            font-weight: bold;
+            color: #f5576c;
+        }
+        
+        .matrix-container {
+            position: relative;
+            width: 100%;
+            max-width: 700px;
+            height: 500px;
+            margin: 30px auto;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+        }
+        
+        .matrix-quadrant {
+            position: absolute;
+            width: 50%;
+            height: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            opacity: 0.9;
+        }
+        
+        .q1 {
+            top: 0;
+            right: 0;
+            background: linear-gradient(135deg, #81c784 0%, #4caf50 100%);
+            color: white;
+        }
+        
+        .q2 {
+            top: 0;
+            left: 0;
+            background: linear-gradient(135deg, #64b5f6 0%, #2196f3 100%);
+            color: white;
+        }
+        
+        .q3 {
+            bottom: 0;
+            left: 0;
+            background: linear-gradient(135deg, #ffb74d 0%, #ff9800 100%);
+            color: white;
+        }
+        
+        .q4 {
+            bottom: 0;
+            right: 0;
+            background: linear-gradient(135deg, #e57373 0%, #f44336 100%);
+            color: white;
+        }
+        
+        .axis-label {
+            position: absolute;
+            font-weight: bold;
+            color: #666;
+        }
+        
+        .axis-x {
+            bottom: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        
+        .axis-y {
+            left: -80px;
+            top: 50%;
+            transform: translateY(-50%) rotate(-90deg);
+        }
+        
+        .guide-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .guide-section h3 {
+            color: #f5576c;
+            margin-bottom: 15px;
+        }
+        
+        .guide-section ul {
+            list-style: none;
+            padding-left: 0;
+        }
+        
+        .guide-section li {
+            padding: 8px 0;
+            padding-left: 25px;
+            position: relative;
+        }
+        
+        .guide-section li:before {
+            content: "▸";
+            position: absolute;
+            left: 0;
+            color: #f5576c;
+            font-weight: bold;
+        }
+        
+        .delete-btn {
+            background: #f44336;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        
+        .delete-btn:hover {
+            background: #d32f2f;
+        }
+
+        .template-responses {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .response-card {
+            background: #f8f9fa;
+            border-left: 4px solid #f5576c;
+            padding: 20px;
+            border-radius: 8px;
+        }
+
+        .response-title {
+            font-weight: bold;
+            color: #f5576c;
+            margin-bottom: 10px;
+        }
+
+        .response-text {
+            font-size: 14px;
+            line-height: 1.6;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 Matrice de Priorisation des Analyses</h1>
+            <p>Gérez vos demandes intelligemment avec le framework Impact/Effort</p>
+        </div>
+        
+        <div class="tabs">
+            <div class="tab active" onclick="switchTab(0)">📋 Demandes</div>
+            <div class="tab" onclick="switchTab(1)">📊 Matrice Visuelle</div>
+            <div class="tab" onclick="switchTab(2)">📖 Guide d'Évaluation</div>
+            <div class="tab" onclick="switchTab(3)">💬 Templates Réponses</div>
+        </div>
+        
+        <!-- Tab 1: Liste des demandes -->
+        <div class="tab-content active" id="tab0">
+            <div class="add-request">
+                <h3 style="margin-bottom: 15px;">➕ Nouvelle demande d'analyse</h3>
+                <div class="form-row">
+                    <input type="text" id="requestName" class="form-input" placeholder="Nom de l'analyse">
+                    <input type="text" id="requestRequester" class="form-input" placeholder="Demandeur">
+                    <input type="number" id="requestImpact" class="form-input" placeholder="Impact /10" min="1" max="10">
+                    <input type="number" id="requestEffort" class="form-input" placeholder="Effort /10" min="1" max="10">
+                </div>
+                <button class="add-btn" onclick="addRequest()">Ajouter</button>
+            </div>
+            
+            <table class="requests-table" id="requestsTable">
+                <thead>
+                    <tr>
+                        <th>Analyse</th>
+                        <th>Demandeur</th>
+                        <th>Impact</th>
+                        <th>Effort</th>
+                        <th>Score</th>
+                        <th>Quadrant</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="requestsBody"></tbody>
+            </table>
+            
+            <button class="add-btn" onclick="exportRequests()">📥 Exporter en CSV</button>
+        </div>
+        
+        <!-- Tab 2: Matrice visuelle -->
+        <div class="tab-content" id="tab1">
+            <div class="matrix-container">
+                <div class="matrix-quadrant q1">
+                    <div style="text-align: center;">
+                        <div style="font-size: 24px; margin-bottom: 10px;">QUICK WINS</div>
+                        <div style="font-size: 14px; opacity: 0.9;">Faire en priorité</div>
+                    </div>
+                </div>
+                <div class="matrix-quadrant q2">
+                    <div style="text-align: center;">
+                        <div style="font-size: 24px; margin-bottom: 10px;">PROJETS</div>
+                        <div style="font-size: 24px; margin-bottom: 10px;">STRATÉGIQUES</div>
+                        <div style="font-size: 14px; opacity: 0.9;">Planifier</div>
+                    </div>
+                </div>
+                <div class="matrix-quadrant q3">
+                    <div style="text-align: center;">
+                        <div style="font-size: 24px; margin-bottom: 10px;">GAINS</div>
+                        <div style="font-size: 24px; margin-bottom: 10px;">MARGINAUX</div>
+                        <div style="font-size: 14px; opacity: 0.9;">Si temps libre</div>
+                    </div>
+                </div>
+                <div class="matrix-quadrant q4">
+                    <div style="text-align: center;">
+                        <div style="font-size: 24px; margin-bottom: 10px;">À ÉVITER</div>
+                        <div style="font-size: 14px; opacity: 0.9;">Dire NON</div>
+                    </div>
+                </div>
+                <div class="axis-label axis-x">EFFORT →</div>
+                <div class="axis-label axis-y">IMPACT →</div>
+            </div>
+            
+            <div style="text-align: center; margin-top: 30px;">
+                <h3>Répartition actuelle</h3>
+                <div style="display: flex; justify-content: center; gap: 30px; margin-top: 20px;">
+                    <div>
+                        <div style="font-size: 36px; font-weight: bold; color: #4caf50;" id="countQuickWins">0</div>
+                        <div>Quick Wins</div>
+                    </div>
+                    <div>
+                        <div style="font-size: 36px; font-weight: bold; color: #2196f3;" id="countStrategic">0</div>
+                        <div>Stratégiques</div>
+                    </div>
+                    <div>
+                        <div style="font-size: 36px; font-weight: bold; color: #ff9800;" id="countMarginal">0</div>
+                        <div>Marginaux</div>
+                    </div>
+                    <div>
+                        <div style="font-size: 36px; font-weight: bold; color: #f44336;" id="countAvoid">0</div>
+                        <div>À éviter</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Tab 3: Guide -->
+        <div class="tab-content" id="tab2">
+            <div class="guide-section">
+                <h3>📊 Critères d'Impact Business (/10)</h3>
+                <ul>
+                    <li><strong>1-3 (Faible) :</strong> Nice-to-have, curiosité, pas de décision à la clé</li>
+                    <li><strong>4-6 (Moyen) :</strong> Utile pour optimisation, influence indirecte</li>
+                    <li><strong>7-8 (Élevé) :</strong> Impact direct sur KPIs secondaires</li>
+                    <li><strong>9-10 (Critique) :</strong> Impact direct sur CA, marge, ou décision stratégique</li>
+                </ul>
+                
+                <h4 style="margin-top: 20px; color: #666;">Questions à se poser :</h4>
+                <ul>
+                    <li>Quelle décision concrète cette analyse va permettre ?</li>
+                    <li>Quel est le coût de l'inaction (ne pas faire l'analyse) ?</li>
+                    <li>Combien de personnes/€ sont concernés ?</li>
+                </ul>
+            </div>
+            
+            <div class="guide-section">
+                <h3>⚙️ Critères d'Effort Technique (/10)</h3>
+                <ul>
+                    <li><strong>1-3 (Faible) :</strong> Requête simple, données propres, 1-2h max</li>
+                    <li><strong>4-6 (Moyen) :</strong> Plusieurs sources, nettoyage léger, 1-2 jours</li>
+                    <li><strong>7-8 (Élevé) :</strong> Multiples jointures, qualité douteuse, 3-5 jours</li>
+                    <li><strong>9-10 (Très élevé) :</strong> Architecture complexe, ML, +1 semaine</li>
+                </ul>
+                
+                <h4 style="margin-top: 20px; color: #666;">Questions à se poser :</h4>
+                <ul>
+                    <li>Les données sont-elles facilement accessibles ?</li>
+                    <li>Quel niveau de nettoyage/transformation nécessaire ?</li>
+                    <li>Ai-je déjà fait quelque chose de similaire ?</li>
+                </ul>
+            </div>
+            
+            <div class="guide-section">
+                <h3>🎯 Règles de Priorisation</h3>
+                <table style="width: 100%; margin-top: 15px;">
+                    <tr>
+                        <th style="padding: 10px; text-align: left; background: #f8f9fa;">Quadrant</th>
+                        <th style="padding: 10px; text-align: left; background: #f8f9fa;">Score</th>
+                        <th style="padding: 10px; text-align: left; background: #f8f9fa;">Action</th>
+                        <th style="padding: 10px; text-align: left; background: #f8f9fa;">Délai</th>
+                    </tr>
+                    <tr>
+                        <td style="padding: 10px;"><span class="quadrant-badge quick-win">Quick Wins</span></td>
+                        <td style="padding: 10px;">> 15</td>
+                        <td style="padding: 10px;">✅ Faire immédiatement</td>
+                        <td style="padding: 10px;">Cette semaine</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 10px;"><span class="quadrant-badge strategic">Stratégiques</span></td>
+                        <td style="padding: 10px;">10-15</td>
+                        <td style="padding: 10px;">📅 Planifier & découper</td>
+                        <td style="padding: 10px;">2-4 semaines</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 10px;"><span class="quadrant-badge marginal">Marginaux</span></td>
+                        <td style="padding: 10px;">5-10</td>
+                        <td style="padding: 10px;">⏸️ Backlog</td>
+                        <td style="padding: 10px;">Quand possible</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 10px;"><span class="quadrant-badge avoid">À éviter</span></td>
+                        <td style="padding: 10px;">< 5</td>
+                        <td style="padding: 10px;">❌ Dire NON</td>
+                        <td style="padding: 10px;">Jamais</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        
+        <!-- Tab 4: Templates de réponses -->
+        <div class="tab-content" id="tab3">
+            <div class="template-responses">
+                <div class="response-card">
+                    <div class="response-title">✅ Pour accepter (Quick Wins)</div>
+                    <div class="response-text">
+                        "Excellente idée, cette analyse peut vraiment impacter [métrique clé]. 
+                        Je m'y mets cette semaine, résultats prévus [date]. 
+                        Besoin de clarifier : [1-2 questions précises]"
+                    </div>
+                </div>
+                
+                <div class="response-card">
+                    <div class="response-title">📅 Pour planifier (Stratégiques)</div>
+                    <div class="response-text">
+                        "Analyse très pertinente mais complexe. Je propose :<br>
+                        - Phase 1 (light) : [partie rapide] → Semaine du [date]<br>
+                        - Phase 2 (complète) : [partie lourde] → [date + 2 semaines]<br>
+                        Ça vous convient ?"
+                    </div>
+                </div>
+                
+                <div class="response-card">
+                    <div class="response-title">⏸️ Pour mettre en backlog (Marginaux)</div>
+                    <div class="response-text">
+                        "Intéressant ! Par contre, actuellement focusé sur [analyses prioritaires]. 
+                        Je note dans mon backlog, je reviens vers vous si du temps se libère. 
+                        En attendant, [alternative rapide si possible]"
+                    </div>
+                </div>
+                
+                <div class="response-card">
+                    <div class="response-title">❌ Pour refuser poliment (À éviter)</div>
+                    <div class="response-text">
+                        "J'ai bien compris votre besoin. Honnêtement, l'effort nécessaire 
+                        ne justifie pas le gain attendu. Voici pourquoi : [explication courte]. 
+                        Alternative : [suggestion moins coûteuse] ou [redirection]"
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let requests = [];
+
+        function addRequest() {
+            const name = document.getElementById('requestName').value;
+            const requester = document.getElementById('requestRequester').value;
+            const impact = parseFloat(document.getElementById('requestImpact').value);
+            const effort = parseFloat(document.getElementById('requestEffort').value);
+            
+            if (!name || !impact || !effort) {
+                alert('Veuillez remplir tous les champs');
+                return;
+            }
+            
+            const score = (impact * 10) / effort;
+            const quadrant = getQuadrant(score, impact, effort);
+            
+            requests.push({name, requester, impact, effort, score, quadrant});
+            
+            document.getElementById('requestName').value = '';
+            document.getElementById('requestRequester').value = '';
+            document.getElementById('requestImpact').value = '';
+            document.getElementById('requestEffort').value = '';
+            
+            renderRequests();
+            updateCounts();
+        }
+
+        function getQuadrant(score, impact, effort) {
+            if (score > 15) return 'quick-win';
+            if (score >= 10) return 'strategic';
+            if (score >= 5) return 'marginal';
+            return 'avoid';
+        }
+
+        function getQuadrantLabel(quadrant) {
+            const labels = {
+                'quick-win': 'Quick Win',
+                'strategic': 'Stratégique',
+                'marginal': 'Marginal',
+                'avoid': 'À éviter'
+            };
+            return labels[quadrant];
+        }
+
+        function renderRequests() {
+            const tbody = document.getElementById('requestsBody');
+            tbody.innerHTML = requests.map((req, index) => `
+                <tr>
+                    <td>${req.name}</td>
+                    <td>${req.requester || '-'}</td>
+                    <td>${req.impact}/10</td>
+                    <td>${req.effort}/10</td>
+                    <td class="score-cell">${req.score.toFixed(1)}</td>
+                    <td><span class="quadrant-badge ${req.quadrant}">${getQuadrantLabel(req.quadrant)}</span></td>
+                    <td><button class="delete-btn" onclick="deleteRequest(${index})">Supprimer</button></td>
+                </tr>
+            `).join('');
+        }
+
+        function deleteRequest(index) {
+            requests.splice(index, 1);
+            renderRequests();
+            updateCounts();
+        }
+
+        function updateCounts() {
+            const counts = {
+                'quick-win': 0,
+                'strategic': 0,
+                'marginal': 0,
+                'avoid': 0
+            };
+            
+            requests.forEach(req => counts[req.quadrant]++);
+            
+            document.getElementById('countQuickWins').textContent = counts['quick-win'];
+            document.getElementById('countStrategic').textContent = counts['strategic'];
+            document.getElementById('countMarginal').textContent = counts['marginal'];
+            document.getElementById('countAvoid').textContent = counts['avoid'];
+        }
+
+        function switchTab(tabIndex) {
+            document.querySelectorAll('.tab').forEach((tab, i) => {
+                tab.classList.toggle('active', i === tabIndex);
+            });
+            
+            document.querySelectorAll('.tab-content').forEach((content, i) => {
+                content.classList.toggle('active', i === tabIndex);
+            });
+        }
+
+        function exportRequests() {
+            let csv = "Matrice de Priorisation des Analyses\n\n";
+            csv += "Analyse,Demandeur,Impact,Effort,Score,Quadrant\n";
+            
+            requests.forEach(req => {
+                csv += `"${req.name}","${req.requester || ''}",${req.impact},${req.effort},${req.score.toFixed(1)},${getQuadrantLabel(req.quadrant)}\n`;
+            });
+            
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'matrice_priorisation.csv';
+            a.click();
+        }
+    </script>
+</body>
+</html>
